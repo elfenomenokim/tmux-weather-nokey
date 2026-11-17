@@ -1,0 +1,9 @@
+flowchart LR
+    Tmux[tmux 상태줄 갱신] --> Cache{캐시가 유효한가?}
+    Cache -->|예| Pill[날씨 표시]
+    Cache -->|아니요| Wttr[wttr.in 요청]
+    Wttr -->|비었거나 잘못됨| OpenMeteo[Open-Meteo 시도]
+    Wttr -->|정상 응답| Save[인식한 날씨 줄 저장]
+    OpenMeteo --> Save
+    Save --> Pill
+    Cache -->|캐시 없음, 두 서비스 실패| Last[마지막 정상 값 유지]

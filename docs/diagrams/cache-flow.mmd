@@ -1,0 +1,9 @@
+flowchart LR
+    Tmux[tmux status refresh] --> Cache{Fresh cached weather?}
+    Cache -->|yes| Pill[Show weather pill]
+    Cache -->|no| Wttr[Request wttr.in]
+    Wttr -->|empty or invalid| OpenMeteo[Try Open-Meteo]
+    Wttr -->|valid| Save[Save recognized line]
+    OpenMeteo --> Save
+    Save --> Pill
+    Cache -->|no cache and both fail| Last[Keep last good value]

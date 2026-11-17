@@ -2,6 +2,15 @@
 
 Instructions for an AI agent asked to install or configure this plugin for a user.
 
+## Repository work
+
+- TPM entry point: `weather.tmux`; weather and clock scripts: `scripts/`.
+- Keep `scripts/weather.sh` POSIX `sh`; do not add an API key or a runtime dependency beyond `curl` (with optional `jq` for fallback parsing).
+- The project has no configured test or lint command. For a manual local check, run `sh -n scripts/weather.sh` and `bash -n weather.tmux`.
+- Use only synthetic weather and isolated tmux socket names in demos. Never inspect or change an existing user tmux server while recording.
+- Keep cache writes atomic and reject malformed upstream replies before replacing the last good value.
+- Do not shorten the documented minimum 600-second interval; both weather services are free and rate-limited.
+
 ## Install for the user
 
 1. Check prerequisites: `tmux -V` (any 3.x), `command -v curl`. `jq` is optional (enables the Open-Meteo fallback); install it with the system package manager if the user agrees.

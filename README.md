@@ -2,86 +2,86 @@
 
 [한국어](README.ko.md)
 
-Current weather, plus a clock face, in your tmux status line. **No API key.**
+A tmux plugin that shows current weather and a clock face in your status line without an API key.
 
-![weather and clock segment](docs/pill.png)
-
-```
-☀️ 14°C 70%
-```
-
-- Uses [wttr.in](https://wttr.in) and falls back to [Open-Meteo](https://open-meteo.com) when wttr.in is slow or down.
-- A bad reply ("Unknown location", HTML error pages, timeouts) never overwrites the cache. If both sources fail you keep seeing the last good value instead of an error.
-- A cache hit runs no network or tmux call, so a 15-second `status-interval` costs almost nothing.
-- Plain POSIX `sh`. Needs `curl`; `jq` only for the fallback.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/demo/weather-status-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/demo/weather-status-light.png">
+  <img alt="A tmux status line with the weather and clock pill" src="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/demo/weather-status-light.png">
+</picture>
 
 ## Install
 
-With [TPM](https://github.com/tmux-plugins/tpm), add to `~/.tmux.conf`:
+With [TPM](https://github.com/tmux-plugins/tpm), add these lines to `~/.tmux.conf` above TPM’s `run` line:
 
 ```tmux
 set -g @plugin 'elfenomenokim/tmux-weather-nokey'
 set -g @weather-location 'Seoul'
-set -g status-right '#{weather} | %H:%M'
-```
-
-Then press `prefix` + `I`. Keep `set -g status-right` **above** the TPM `run` line.
-
-Manual install: clone the repo and add `run-shell /path/to/tmux-weather-nokey/weather.tmux` to `~/.tmux.conf`.
-
-## Placeholders
-
-| Placeholder | Output |
-|---|---|
-| `#{weather}` | `☀️ 14°C 70%` |
-| `#{weather_icon}` | `☀️` |
-| `#{weather_temp}` | `14°C 70%` |
-| `#{clock_icon}` | `🕓` clock face for the current time, to the nearest half hour (🕐 1:00, 🕜 1:30) |
-| `#{weather_pill}` | The ready-made segment in the picture above: weather icon, temperature, clock face, time |
-
-Split icon and temperature to style them in separate segments (for example with catppuccin or dracula themes), or use `#{weather_pill}` for a finished look:
-
-```tmux
 set -g status-right '#{weather_pill}'
 ```
 
-### `#{weather_pill}` options
+Press `prefix` + `I` to install the plugin. Without TPM, clone this repository and add `run-shell /path/to/tmux-weather-nokey/weather.tmux`.
 
-| Option | Default | Meaning |
-|---|---|---|
-| `@weather-pill-weather-bg` / `-soft` / `-fg` | `#179299` / `#d0f0f0` / `#0a5050` | Icon block, temperature block, temperature text |
-| `@weather-pill-clock-bg` / `-soft` / `-fg` | `#dc8a78` / `#fde0d8` / `#7a3020` | Clock block, time block, time text |
-| `@weather-pill-icon-fg` | `#dce0e8` | Text colour on the solid blocks |
-| `@weather-pill-time-format` | `%H:%M` | `strftime` format, for example `%I:%M %p` |
-| `@weather-pill-separator` | empty | Put a Powerline glyph such as `` here if your font has one |
+## Quick start
 
-Set these above the TPM `run` line, like `status-right`.
+The sample below reads a seeded cache, so it uses no live weather service.
+
+```console
+$ WEATHER_CACHE_DIR=/tmp/weather-nokey-cache scripts/weather.sh full
+☀️ 14°C 70%
+$ WEATHER_CACHE_DIR=/tmp/weather-nokey-cache scripts/weather.sh icon
+☀️
+$ WEATHER_CACHE_DIR=/tmp/weather-nokey-cache scripts/weather.sh temp
+14°C 70%
+```
+
+Add the plugin and `#{weather_pill}` to `~/.tmux.conf` as shown above to display the segment in tmux.
+
+## Full recording
+
+The recording shows the status line inside an isolated tmux session with a seeded weather cache.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/demo/weather-dark.gif">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/demo/weather-light.gif">
+  <img alt="The weather pill in a tmux status line" src="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/demo/weather-light.gif">
+</picture>
+
+## Status formats
+
+Use `#{weather_pill}` for the coloured segment, or place `#{weather}`, `#{weather_icon}`, `#{weather_temp}` and `#{clock_icon}` separately in `status-right`. For example, `#{weather}` prints `☀️ 14°C 70%`.
+
+Set `@weather-units` to `metric` or `imperial`. `@weather-location` accepts a city or `lat,lon`; wttr.in can infer a location when it is empty, but the Open-Meteo fallback needs coordinates or a city name.
+
+## How it gets weather
+
+The plugin requests wttr.in first and uses Open-Meteo if that response is empty or invalid. It caches only a recognized weather line. A cache hit runs no network request; if both sources fail, the last good cached value remains visible. The default cache interval is 1800 seconds.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/diagrams/cache-flow.dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/diagrams/cache-flow.light.svg">
+  <img alt="The tmux plugin reads fresh cache, requests weather services when needed and retains the last good value" src="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/diagrams/cache-flow.light.svg">
+</picture>
+
+The scripts use POSIX `sh` and `curl`. `jq` is optional and enables the Open-Meteo fallback. No account or API key is required.
 
 ## Options
 
-| Option | Default | Meaning |
+| tmux option | Default | Purpose |
 |---|---|---|
-| `@weather-location` | empty | City name or `lat,lon`. Empty lets wttr.in guess from your IP; the fallback needs a value. |
+| `@weather-location` | empty | City or `lat,lon` |
 | `@weather-units` | `metric` | `metric` or `imperial` |
-| `@weather-interval` | `1800` | Cache lifetime in seconds |
-| `@weather-timeout` | `3` | Seconds per request |
-| `@weather-humidity` | `on` | `off` hides the humidity |
+| `@weather-interval` | `1800` | Cache time in seconds |
+| `@weather-timeout` | `3` | Request timeout in seconds |
+| `@weather-humidity` | `on` | Set `off` to hide humidity |
 | `@weather-lang` | `en` | wttr.in language code |
 
-Every tmux server can share one setting through `~/.config/tmux-weather-nokey/config` (one `key=value` per line, for example `location=Seoul`, `units=imperial`). Order of precedence: environment variable, tmux option, config file, default.
+Each option can also come from an environment variable or `~/.config/tmux-weather-nokey/config` (`key=value`, one per line). Environment variables take priority, then tmux options, config file and defaults.
 
-Each option can also come from an environment variable (`WEATHER_LOCATION`, `WEATHER_UNITS`, ...), which is handy outside tmux:
+## Limits
 
-```sh
-WEATHER_LOCATION=Paris scripts/weather.sh temp
-```
-
-The cache lives in `${XDG_CACHE_HOME:-~/.cache}/tmux-weather-nokey/current`. Delete it to refresh at once after changing an option.
-
-## Why another weather plugin?
-
-wttr.in is a single free server. It sometimes accepts the connection and then never answers, and a "location not found" reply can sit in a naive cache for an hour. This plugin was written after both happened, so it keeps a second source and only caches good lines.
+`curl` is required. The fallback requires `jq` and a location it can resolve. Weather values depend on the upstream services and can be stale while both are unavailable. Keep the interval at 600 seconds or longer to avoid overloading the free services.
 
 ## License
 
-MIT
+MIT.
