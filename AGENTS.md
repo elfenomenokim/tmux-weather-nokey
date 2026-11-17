@@ -8,13 +8,14 @@ Instructions for an AI agent asked to install or configure this plugin for a use
 2. If `~/.tmux/plugins/tpm` exists, add `set -g @plugin 'elfenomenokim/tmux-weather-nokey'` to `~/.tmux.conf` before the line `run '~/.tmux/plugins/tpm/tpm'`, then run `~/.tmux/plugins/tpm/bin/install_plugins`.
    Without TPM: `git clone https://github.com/elfenomenokim/tmux-weather-nokey ~/.tmux/plugins/tmux-weather-nokey` and append `run-shell ~/.tmux/plugins/tmux-weather-nokey/weather.tmux` to `~/.tmux.conf`.
 3. Ask the user for a location (city name or `lat,lon`) and units; set `@weather-location` / `@weather-units`. Do not guess the user's home location.
-4. Put `#{weather}` (or `#{weather_icon}` and `#{weather_temp}`) into the existing `status-right`; keep that `set` line above the TPM `run` line. Preserve the user's other status content.
+4. Put `#{weather}` (or `#{weather_icon}` and `#{weather_temp}`, plus `#{clock_icon}` if wanted) into the existing `status-right`, or `#{weather_pill}` when the user wants the finished coloured segment; keep that `set` line above the TPM `run` line. Preserve the user's other status content.
 5. Apply: `tmux source-file ~/.tmux.conf`.
 
 ## Verify
 
 - `WEATHER_LOCATION='<location>' ~/.tmux/plugins/tmux-weather-nokey/scripts/weather.sh full` prints one line such as `☀️ 14°C 70%`; `n/a` means both sources failed and nothing is cached yet.
-- `tmux show -gv status-right` should contain `scripts/weather.sh` instead of the `#{weather...}` placeholders.
+- `tmux show -gv status-right` should contain `scripts/weather.sh` (and `scripts/clock.sh`) instead of the placeholders.
+- `~/.tmux/plugins/tmux-weather-nokey/scripts/clock.sh` prints one clock-face emoji.
 
 ## Do not
 

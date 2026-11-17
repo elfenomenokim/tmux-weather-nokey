@@ -2,7 +2,9 @@
 
 [한국어](README.ko.md)
 
-Current weather in your tmux status line. **No API key.**
+Current weather, plus a clock face, in your tmux status line. **No API key.**
+
+![weather and clock segment](docs/pill.png)
 
 ```
 ☀️ 14°C 70%
@@ -34,8 +36,26 @@ Manual install: clone the repo and add `run-shell /path/to/tmux-weather-nokey/we
 | `#{weather}` | `☀️ 14°C 70%` |
 | `#{weather_icon}` | `☀️` |
 | `#{weather_temp}` | `14°C 70%` |
+| `#{clock_icon}` | `🕓` clock face for the current time, to the nearest half hour (🕐 1:00, 🕜 1:30) |
+| `#{weather_pill}` | The ready-made segment in the picture above: weather icon, temperature, clock face, time |
 
-Split icon and temperature to style them in separate segments (for example with catppuccin or dracula themes).
+Split icon and temperature to style them in separate segments (for example with catppuccin or dracula themes), or use `#{weather_pill}` for a finished look:
+
+```tmux
+set -g status-right '#{weather_pill}'
+```
+
+### `#{weather_pill}` options
+
+| Option | Default | Meaning |
+|---|---|---|
+| `@weather-pill-weather-bg` / `-soft` / `-fg` | `#179299` / `#d0f0f0` / `#0a5050` | Icon block, temperature block, temperature text |
+| `@weather-pill-clock-bg` / `-soft` / `-fg` | `#dc8a78` / `#fde0d8` / `#7a3020` | Clock block, time block, time text |
+| `@weather-pill-icon-fg` | `#dce0e8` | Text colour on the solid blocks |
+| `@weather-pill-time-format` | `%H:%M` | `strftime` format, for example `%I:%M %p` |
+| `@weather-pill-separator` | empty | Put a Powerline glyph such as `` here if your font has one |
+
+Set these above the TPM `run` line, like `status-right`.
 
 ## Options
 

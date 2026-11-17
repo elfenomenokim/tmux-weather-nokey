@@ -2,7 +2,9 @@
 
 [English](README.md)
 
-tmux 상태줄에 지금 날씨를 보여 줍니다. **API 키가 필요 없습니다.**
+tmux 상태줄에 지금 날씨와 시계를 보여 줍니다. **API 키가 필요 없습니다.**
+
+![날씨와 시계 칸](docs/pill.png)
 
 ```
 ☀️ 14°C 70%
@@ -34,8 +36,26 @@ set -g status-right '#{weather} | %H:%M'
 | `#{weather}` | `☀️ 14°C 70%` |
 | `#{weather_icon}` | `☀️` |
 | `#{weather_temp}` | `14°C 70%` |
+| `#{clock_icon}` | 지금 시각의 시계 이모지 `🕓`. 30분 단위까지 맞춥니다(🕐 1시, 🕜 1시 반) |
+| `#{weather_pill}` | 위 사진의 완성된 칸: 날씨 아이콘, 기온, 시계, 시각 |
 
-아이콘과 기온을 나누면 catppuccin, dracula 같은 테마에서 칸을 따로 꾸밀 수 있습니다.
+아이콘과 기온을 나누면 catppuccin, dracula 같은 테마에서 칸을 따로 꾸밀 수 있습니다. 바로 쓰려면 `#{weather_pill}`을 넣습니다.
+
+```tmux
+set -g status-right '#{weather_pill}'
+```
+
+### `#{weather_pill}` 옵션
+
+| 옵션 | 기본값 | 뜻 |
+|---|---|---|
+| `@weather-pill-weather-bg` / `-soft` / `-fg` | `#179299` / `#d0f0f0` / `#0a5050` | 아이콘 칸, 기온 칸, 기온 글자 색 |
+| `@weather-pill-clock-bg` / `-soft` / `-fg` | `#dc8a78` / `#fde0d8` / `#7a3020` | 시계 칸, 시각 칸, 시각 글자 색 |
+| `@weather-pill-icon-fg` | `#dce0e8` | 진한 칸의 글자 색 |
+| `@weather-pill-time-format` | `%H:%M` | `strftime` 형식. 예: `%I:%M %p` |
+| `@weather-pill-separator` | 비움 | 글꼴에 Powerline 기호가 있으면 ``처럼 넣습니다 |
+
+이 옵션들도 `status-right`처럼 TPM `run` 줄보다 위에 둡니다.
 
 ## 옵션
 
