@@ -1,8 +1,15 @@
+<img src="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/logo.svg" width="96" height="96" alt="상태줄에 표시되는 날씨를 해와 구름으로 그린 아이콘">
+
 # tmux-weather-nokey
 
 [English](README.md)
 
 현재 날씨와 시계 아이콘을 tmux 상태줄에 표시하는 플러그인입니다. API 키는 필요 없습니다.
+
+tmux 3.x · POSIX sh · no API key
+
+[![tmux](https://img.shields.io/badge/tmux-3.x-lightgrey)](https://github.com/tmux/tmux)
+[![license](https://img.shields.io/github/license/elfenomenokim/tmux-weather-nokey)](https://github.com/elfenomenokim/tmux-weather-nokey/blob/main/LICENSE)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/demo/weather-status-dark.png">
@@ -82,6 +89,10 @@ $ WEATHER_CACHE_DIR=/tmp/weather-nokey-cache scripts/weather.sh temp
 
 `curl`이 필요합니다. 예비 경로에는 `jq`와 조회 가능한 위치가 필요합니다. 두 서비스가 모두 막히면 표시되는 값이 오래됐을 수 있습니다. 무료 서비스의 부하를 줄이려면 간격을 600초보다 짧게 설정하지 마세요.
 
+## 기여
+
+이슈와 풀 리퀘스트를 환영합니다. 셸 확인과 리뷰 방식은 [CONTRIBUTING.md](CONTRIBUTING.md)에 있습니다.
+
 ## 라이선스
 
-MIT.
+MIT입니다. [LICENSE](LICENSE)를 보세요.

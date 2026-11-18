@@ -1,8 +1,15 @@
+<img src="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/logo.svg" width="96" height="96" alt="tmux-weather-nokey: sun and cloud for the weather in a status line">
+
 # tmux-weather-nokey
 
 [한국어](README.ko.md)
 
 A tmux plugin that shows current weather and a clock face in your status line without an API key.
+
+tmux 3.x · POSIX sh · no API key
+
+[![tmux](https://img.shields.io/badge/tmux-3.x-lightgrey)](https://github.com/tmux/tmux)
+[![license](https://img.shields.io/github/license/elfenomenokim/tmux-weather-nokey)](https://github.com/elfenomenokim/tmux-weather-nokey/blob/main/LICENSE)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/demo/weather-status-dark.png">
@@ -82,6 +89,10 @@ Each option can also come from an environment variable or `~/.config/tmux-weathe
 
 `curl` is required. The fallback requires `jq` and a location it can resolve. Weather values depend on the upstream services and can be stale while both are unavailable. Keep the interval at 600 seconds or longer to avoid overloading the free services.
 
+## Contributing
+
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the shell checks and the review process.
+
 ## License
 
-MIT.
+MIT. See [LICENSE](LICENSE).

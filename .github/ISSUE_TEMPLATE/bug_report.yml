@@ -1,0 +1,45 @@
+name: Bug report
+description: Something did not work the way this repository says it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report a security problem here. Use the private advisories form instead.
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+      description: The command you ran and its output, copied as text.
+      placeholder: |
+        $ ~/.tmux/plugins/tmux-weather-nokey/scripts/weather.sh
+        ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: 'The commit you cloned, or the tag TPM installed.'
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      description: 'tmux version (`tmux -V`), OS, and whether `jq` is installed.'
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: A small reproduction, or what you already tried.
+    validations:
+      required: false
