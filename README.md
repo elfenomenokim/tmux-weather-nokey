@@ -1,3 +1,5 @@
+<div align="center">
+
 <img src="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/logo.svg" width="96" height="96" alt="tmux-weather-nokey: sun and cloud for the weather in a status line">
 
 # tmux-weather-nokey
@@ -10,6 +12,10 @@ tmux 3.x · POSIX sh · no API key
 
 [![tmux](https://img.shields.io/badge/tmux-3.x-lightgrey)](https://github.com/tmux/tmux)
 [![license](https://img.shields.io/github/license/elfenomenokim/tmux-weather-nokey)](https://github.com/elfenomenokim/tmux-weather-nokey/blob/main/LICENSE)
+
+[Install](#install) · [Quick start](#quick-start) · [Full recording](#full-recording)
+
+</div>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/demo/weather-status-dark.png">

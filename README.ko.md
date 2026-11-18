@@ -1,3 +1,5 @@
+<div align="center">
+
 <img src="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/logo.svg" width="96" height="96" alt="상태줄에 표시되는 날씨를 해와 구름으로 그린 아이콘">
 
 # tmux-weather-nokey
@@ -10,6 +12,10 @@ tmux 3.x · POSIX sh · no API key
 
 [![tmux](https://img.shields.io/badge/tmux-3.x-lightgrey)](https://github.com/tmux/tmux)
 [![license](https://img.shields.io/github/license/elfenomenokim/tmux-weather-nokey)](https://github.com/elfenomenokim/tmux-weather-nokey/blob/main/LICENSE)
+
+[설치](#설치) · [빠르게 써 보기](#빠르게-써-보기) · [전체 녹화](#전체-녹화)
+
+</div>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/demo/weather-status-dark.png">
