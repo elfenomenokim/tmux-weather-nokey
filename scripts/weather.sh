@@ -16,7 +16,6 @@ set -u
 
 PART="${1:-full}"
 CACHE_DIR="${WEATHER_CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/tmux-weather-nokey}"
-CACHE="$CACHE_DIR/current"
 
 emit() {
   case "$PART" in
@@ -25,15 +24,6 @@ emit() {
     *) printf '%s' "$1" ;;
   esac
 }
-
-# Cache line 1 = expiry epoch, line 2 = value. A hit costs one `date`, no tmux or network call.
-now="$(date +%s)"
-expires=0; cached=""
-if [ -r "$CACHE" ]; then
-  { read -r expires; read -r cached; } < "$CACHE" || true
-  case "$expires" in ''|*[!0-9]*) expires=0 ;; esac
-  if [ "$now" -lt "$expires" ] && [ -n "$cached" ]; then emit "$cached"; exit 0; fi
-fi
 
 # Optional shared config file (key=value per line, keys without "@weather-"), read once on a miss.
 CONFIG="${WEATHER_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/tmux-weather-nokey/config}"
@@ -58,14 +48,31 @@ humidity="$(opt @weather-humidity "${WEATHER_HUMIDITY:-}" on)"
 lang="$(opt @weather-lang "${WEATHER_LANG:-}" en)"
 case "$interval" in ''|*[!0-9]*) interval=1800 ;; esac
 
+# Different locations and display options must not share cached weather.
+key="$(printf '%s\n' "$location" "$units" "$humidity" "$lang" | cksum | awk '{print $1 "-" $2}')"
+CACHE="$CACHE_DIR/current-$key"
+# Cache line 1 = expiry epoch, line 2 = value. Entries are specific to effective output options.
+now="$(date +%s)"
+expires=0; cached=""
+if [ -r "$CACHE" ]; then
+  { read -r expires; read -r cached; } < "$CACHE" || true
+  case "$expires" in ''|*[!0-9]*) expires=0 ;; esac
+  if [ "$now" -lt "$expires" ] && [ -n "$cached" ]; then emit "$cached"; exit 0; fi
+fi
+
 urlencode() { printf '%s' "$1" | jq -sRr @uri 2>/dev/null || printf '%s' "$1" | sed 's/ /%20/g'; }
 format="%c+%t"; [ "$humidity" = off ] || format="$format+%h"
 wunit="m"; [ "$units" = imperial ] && wunit="u"
 
 weather="$(curl -s --max-time "$timeout" "https://wttr.in/$(urlencode "$location")?format=$format&$wunit&lang=$lang" 2>/dev/null | tr -d '+' | xargs 2>/dev/null || true)"
-case "$weather" in
-  ""|*[Uu]nknown*|*"not available"*|*"not found"*|*Sorry*|*error*|*ERROR*|*"<"*) weather="" ;;
-esac
+valid_weather() {
+  if [ "$humidity" = off ]; then
+    printf '%s\n' "$1" | grep -Eq '^[^ ]+ -?[0-9]+°[CF]$'
+  else
+    printf '%s\n' "$1" | grep -Eq '^[^ ]+ -?[0-9]+°[CF] [0-9]+%$'
+  fi
+}
+valid_weather "$weather" || weather=""
 
 # Fallback: Open-Meteo needs coordinates; a name is resolved once with its geocoder.
 if [ -z "$weather" ] && [ -n "$location" ] && command -v jq >/dev/null 2>&1; then
@@ -88,8 +95,14 @@ if [ -z "$weather" ] && [ -n "$location" ] && command -v jq >/dev/null 2>&1; the
   fi
 fi
 
+valid_weather "$weather" || weather=""
 if [ -n "$weather" ]; then
-  mkdir -p "$CACHE_DIR" 2>/dev/null && printf '%s\n%s\n' "$((now + interval))" "$weather" > "$CACHE.tmp" && mv "$CACHE.tmp" "$CACHE"
+  if mkdir -p "$CACHE_DIR" 2>/dev/null; then
+    tmp="$(mktemp "$CACHE_DIR/.weather.XXXXXXXX" 2>/dev/null || true)"
+    if [ -n "$tmp" ]; then
+      printf '%s\n%s\n' "$((now + interval))" "$weather" > "$tmp" && mv "$tmp" "$CACHE"
+    fi
+  fi
   emit "$weather"
 elif [ -n "$cached" ]; then
   emit "$cached"   # both sources down: keep showing the last good value
