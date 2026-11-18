@@ -35,6 +35,10 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - name: Git identity for the review action
+        run: |
+          git config --global user.name "opencode-review"
+          git config --global user.email "opencode-review@users.noreply.github.com"
       - name: Run OpenCode review
         uses: anomalyco/opencode/github@latest
         env:
@@ -58,4 +62,5 @@ jobs:
             file:line, what breaks, and the smallest correct fix.
             If nothing qualifies, reply with one short line saying no real defects were found.
             Keep the whole comment under 40 lines. Do not edit code, do not push commits,
-            do not run the test suite.
+            do not run the test suite. Read the code only: do not execute the project's
+            scripts or binaries, make network calls, or run git commands that change state.
