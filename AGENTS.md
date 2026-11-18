@@ -31,3 +31,16 @@ Instructions for an AI agent asked to install or configure this plugin for a use
 - Do not shorten `@weather-interval` below 600 seconds; both services are free and rate-limited.
 - Do not delete the cache to "fix" a stale value unless the user changed an option.
 - Do not add API keys; the plugin needs none.
+
+## Code Review Rules
+
+A change is a real defect when it:
+
+- uses a shell feature that POSIX `sh` does not have, or adds a runtime dependency beyond `curl` and the optional `jq`.
+- makes a cache write non-atomic, or replaces the last good value with a malformed upstream reply.
+- lets `@weather-interval` run below 600 seconds, or adds an API key requirement.
+- changes the source order (wttr.in first, Open-Meteo fallback) or the `n/a` result when both fail and nothing is cached.
+- renames a placeholder or segment without updating the README, so the documented `status-right` value stops working.
+- breaks `sh -n scripts/weather.sh` or `bash -n weather.tmux`.
+
+Not defects: wording, formatting, comment style, requested extra tests, or a renamed helper.
