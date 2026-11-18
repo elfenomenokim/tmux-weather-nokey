@@ -1,0 +1,11 @@
+{
+  "name": "tmux-weather-nokey",
+  "sentence": "A tmux plugin that shows current weather and a clock face in your status line without an API key.",
+  "tag": "TMUX · SHELL",
+  "terminal": [
+    "$ scripts/weather.sh full",
+    "☀️ 14°C 70%",
+    "status-right: #{weather_pill}"
+  ],
+  "flow": ["Check cached value", "Fetch only on cache miss", "Show weather pill"]
+}
