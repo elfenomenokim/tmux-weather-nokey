@@ -60,7 +60,27 @@ if [ -r "$CACHE" ]; then
   if [ "$now" -lt "$expires" ] && [ -n "$cached" ]; then emit "$cached"; exit 0; fi
 fi
 
-urlencode() { printf '%s' "$1" | jq -sRr @uri 2>/dev/null || printf '%s' "$1" | sed 's/ /%20/g'; }
+urlencode() {  # jq is optional: encode every byte outside the unreserved set when it is absent
+  if command -v jq >/dev/null 2>&1; then
+    printf '%s' "$1" | jq -sRr @uri
+    return
+  fi
+  encoded=""
+  for byte in $(printf '%s' "$1" | od -An -v -tu1); do
+    case "$byte" in
+      45|46|95|126) encoded="$encoded$(printf "\\$(printf '%03o' "$byte")")" ;;
+      *)
+        if { [ "$byte" -ge 48 ] && [ "$byte" -le 57 ]; } \
+          || { [ "$byte" -ge 65 ] && [ "$byte" -le 90 ]; } \
+          || { [ "$byte" -ge 97 ] && [ "$byte" -le 122 ]; }; then
+          encoded="$encoded$(printf "\\$(printf '%03o' "$byte")")"
+        else
+          encoded="$encoded$(printf '%%%02X' "$byte")"
+        fi ;;
+    esac
+  done
+  printf '%s' "$encoded"
+}
 format="%c+%t"; [ "$humidity" = off ] || format="$format+%h"
 wunit="m"; [ "$units" = imperial ] && wunit="u"
 
@@ -78,13 +98,13 @@ valid_weather "$weather" || weather=""
 if [ -z "$weather" ] && [ -n "$location" ] && command -v jq >/dev/null 2>&1; then
   case "$location" in
     *[0-9],*[0-9]*) lat="${location%%,*}"; lon="${location#*,}" ;;
-    *) geo="$(curl -s --max-time 5 "https://geocoding-api.open-meteo.com/v1/search?count=1&name=$(urlencode "$location")" 2>/dev/null || true)"
+    *) geo="$(curl -s --max-time "$timeout" "https://geocoding-api.open-meteo.com/v1/search?count=1&name=$(urlencode "$location")" 2>/dev/null || true)"
        lat="$(printf '%s' "$geo" | jq -r '.results[0].latitude // empty' 2>/dev/null)"
        lon="$(printf '%s' "$geo" | jq -r '.results[0].longitude // empty' 2>/dev/null)" ;;
   esac
   if [ -n "${lat:-}" ] && [ -n "${lon:-}" ]; then
     tunit=""; sym="°C"; [ "$units" = imperial ] && { tunit="&temperature_unit=fahrenheit"; sym="°F"; }
-    reply="$(curl -s --max-time 5 "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code&timezone=auto$tunit" 2>/dev/null || true)"
+    reply="$(curl -s --max-time "$timeout" "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code&timezone=auto$tunit" 2>/dev/null || true)"
     weather="$(printf '%s' "$reply" | jq -r --arg sym "$sym" --arg hum "$humidity" '.current | (
       (.weather_code) as $c |
       (if $c == 0 then "☀️" elif $c <= 2 then "⛅" elif $c == 3 then "☁️" elif $c == 45 or $c == 48 then "🌫️"
@@ -96,16 +116,33 @@ if [ -z "$weather" ] && [ -n "$location" ] && command -v jq >/dev/null 2>&1; the
 fi
 
 valid_weather "$weather" || weather=""
-if [ -n "$weather" ]; then
-  if mkdir -p "$CACHE_DIR" 2>/dev/null; then
-    tmp="$(mktemp "$CACHE_DIR/.weather.XXXXXXXX" 2>/dev/null || true)"
-    if [ -n "$tmp" ]; then
-      printf '%s\n%s\n' "$((now + interval))" "$weather" > "$tmp" && mv "$tmp" "$CACHE"
-    fi
+
+# Cache writes are atomic, and an interrupted write leaves the previous entry alone.
+tmp=""
+cleanup() { [ -z "${tmp:-}" ] || rm -f "$tmp"; }
+trap cleanup EXIT
+trap 'cleanup; exit 1' HUP INT TERM
+write_cache() {  # write_cache <expiry> <value>
+  mkdir -p "$CACHE_DIR" 2>/dev/null || return 0
+  tmp="$(mktemp "$CACHE_DIR/.weather.XXXXXXXX" 2>/dev/null || true)"
+  [ -n "$tmp" ] || return 0
+  if printf '%s\n%s\n' "$1" "$2" > "$tmp" && mv "$tmp" "$CACHE"; then
+    tmp=""
+  else
+    cleanup
+    tmp=""
   fi
+}
+
+if [ -n "$weather" ]; then
+  write_cache "$((now + interval))" "$weather"
   emit "$weather"
 elif [ -n "$cached" ]; then
-  emit "$cached"   # both sources down: keep showing the last good value
+  # Both sources failed: keep showing the last good value, and retry only after one interval.
+  write_cache "$((now + interval))" "$cached"
+  emit "$cached"
 else
+  # Nothing cached yet: remember the miss so a down service is not queried on every refresh.
+  write_cache "$((now + interval))" "n/a"
   emit "n/a"
 fi

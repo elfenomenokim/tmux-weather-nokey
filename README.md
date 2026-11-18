@@ -70,7 +70,7 @@ Set `@weather-units` to `metric` or `imperial`. `@weather-location` accepts a ci
 
 ## How it gets weather
 
-The plugin requests wttr.in first and uses Open-Meteo if that response is empty or invalid. It caches only a recognized weather line. A cache hit runs no network request; if both sources fail, the last good cached value remains visible. The default cache interval is 1800 seconds.
+The plugin requests wttr.in first and uses Open-Meteo if that response is empty or invalid. It caches only a recognized weather line. A cache hit runs no network request; if both sources fail, the last good cached value remains visible and the failure is cached for one interval, so a down service is not queried on every status refresh. With nothing cached yet, `n/a` is shown and cached the same way. The default cache interval is 1800 seconds.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/diagrams/cache-flow.dark.svg">

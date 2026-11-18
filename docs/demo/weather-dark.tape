@@ -1,4 +1,4 @@
-Output docs/products/dotfiles/tmux/plugins/tmux-weather-nokey/docs/demo/weather-dark.gif
+Output docs/demo/weather-dark.gif
 Set Shell bash
 Set FontSize 18
 Set Width 1200
@@ -13,7 +13,7 @@ Set TypingSpeed 0
 Sleep 500ms
 Type "export PS1='$ '"
 Enter
-Type "sh docs/products/dotfiles/tmux/plugins/tmux-weather-nokey/docs/demo/setup-dark.sh"
+Type "sh docs/demo/setup-dark.sh"
 Enter
 Sleep 1s
 Type "clear"

@@ -70,7 +70,7 @@ $ WEATHER_CACHE_DIR=/tmp/weather-nokey-cache scripts/weather.sh temp
 
 ## 날씨 조회와 캐시
 
-먼저 wttr.in에 요청하고 응답이 비었거나 잘못되면 Open-Meteo를 씁니다. 형식이 맞는 날씨 값만 캐시에 저장합니다. 캐시가 유효하면 네트워크를 호출하지 않습니다. 두 서비스가 모두 안 되면 마지막 정상 값을 계속 보여 줍니다. 기본 캐시 시간은 1800초입니다.
+먼저 wttr.in에 요청하고 응답이 비었거나 잘못되면 Open-Meteo를 씁니다. 형식이 맞는 날씨 값만 캐시에 저장합니다. 캐시가 유효하면 네트워크를 호출하지 않습니다. 두 서비스가 모두 안 되면 마지막 정상 값을 계속 보여 주고 그 실패를 한 interval 동안 캐시에 기록하므로, 서비스가 죽어 있어도 상태줄 갱신마다 요청하지 않습니다. 캐시가 비어 있으면 `n/a`를 같은 방식으로 보여 주고 기록합니다. 기본 캐시 시간은 1800초입니다.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/elfenomenokim/tmux-weather-nokey/main/docs/diagrams/cache-flow.dark.ko.svg">

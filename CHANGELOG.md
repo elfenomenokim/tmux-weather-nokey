@@ -8,6 +8,17 @@ entries are dated and no version number is attached.
 
 ### Fixed
 
+- An expired cache no longer re-queries the weather services on every status refresh while both
+  fail: the last good value, or `n/a` when nothing is cached, is kept and the expiry is renewed for
+  one interval.
+- `@weather-timeout` now applies to both Open-Meteo requests, not only to wttr.in.
+- Without `jq`, a location is percent-encoded by byte, so `#`, `?`, `%`, comma and non-ASCII names no
+  longer truncate or mangle the wttr.in request.
+- A refresh interrupted before the cache write leaves no `.weather.*` temporary file.
+- The demo setup resolves the plugin root from its own path and seeds the hashed cache key with
+  pinned options, so a recording reads the synthetic value instead of live weather; the tapes use
+  repository-relative paths.
+
 - A malformed upstream reply (`Bad Gateway` and similar) is rejected before it replaces the last
   good value, and the fallback runs instead of caching the failure.
 - The cache identity includes location, units, humidity and language, so a changed option shows a
