@@ -40,8 +40,9 @@ sessions are untouched.
 
 - **A note on what you ran** before and after, with the real line it printed.
 - **A line under Unreleased** in [CHANGELOG.md](CHANGELOG.md) when a user will notice.
-- **The platforms you did not test** written in the pull request (tmux 3.x on remote hosts, BSD
-  shells).
+- **The platforms you did not test** written in the pull request. The `tests` workflow checks shell
+  syntax and `scripts/clock.sh` on Ubuntu and macOS; live tmux 3.x sessions, remote hosts and
+  network weather fetches stay manual.
 
 ## Review
 

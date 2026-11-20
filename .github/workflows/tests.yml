@@ -1,0 +1,34 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        # tmux 3.x and POSIX sh plugin; runs on Linux (dash) and macOS (BSD sh). Windows is omitted.
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Check shell syntax and offline clock script
+        shell: bash
+        run: |
+          # Live weather fetches (scripts/weather.sh queries wttr.in / Open-Meteo over the network)
+          # and tmux status-line interpolation (weather.tmux requires a live tmux server) are left out of CI.
+          sh -n scripts/weather.sh
+          sh -n scripts/clock.sh
+          bash -n weather.tmux
+          clock_out="$(sh scripts/clock.sh)"
+          test -n "$clock_out"
